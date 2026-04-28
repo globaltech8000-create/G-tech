@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Skofield | G-TECH Founders Portfolio</title>
+    <link rel="icon" href="logo.png"type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* High-end Mirror Glass Effects */
+            --mirror-bg: rgba(255, 255, 255, 0.03);
+            --mirror-border: rgba(255, 255, 255, 0.12);
+            --mirror-reflection: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.05) 100%);
+            --accent-blue: #00d2ff;
+            --accent-purple: #9d50bb;
+            --glass-shine: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: #050508;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* Mouse Tracking Glow */
+        #cursor-glow {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.07) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Glass Panel Styling */
+        .glass-panel {
+            background: var(--mirror-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--mirror-border);
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--mirror-reflection);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Top System Status Bar */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 110px;
+            right: 0;
+            height: 45px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Sidebar Navigation */
+        .floating-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 75px;
+            padding: 25px 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-dot {
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            text-decoration: none;
+        }
+
+        .nav-dot:hover, .nav-dot.active {
+            background: white;
+            color: black;
+            transform: scale(1.1) translateX(10px);
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        }
+
+        /* Content Sections */
+        .section-container {
+            margin-left: 110px;
+            padding: 100px 40px 40px 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-card {
+            max-width: 1200px;
+            width: 100%;
+            padding: 60px;
+            display: none;
+            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .content-card.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Professional Stats */
+        .stat-box {
+            padding: 20px;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            transition: 0.3s;
+        }
+        .stat-box:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--accent-blue);
+        }
+
+        /* Timeline Items */
+        .timeline-item {
+            border-left: 1px solid var(--mirror-border);
+            padding-left: 30px;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .timeline-item::after {
+            content: "";
+            position: absolute;
+            left: -5px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            box-shadow: 0 0 15px var(--accent-blue);
+        }
+
+        /* App Grid */
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .link-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 35px;
+            border-radius: 32px;
+            text-align: center;
+            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            text-decoration: none;
+            color: white;
+            position: relative;
+        }
+
+        .link-card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.2);
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        /* Team Image Styling */
+        .team-image {
+            width: 100%;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 24px;
+            filter: grayscale(100%);
+            transition: 0.5s;
+        }
+        .team-card:hover .team-image {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        .mirror-footer {
+            margin: 40px 40px 40px 150px;
+            padding: 60px;
+        }
+
+        /* Availability Badge */
+        .avail-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 100px;
+            color: #4ade80;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 1024px) {
+            .mirror-footer { margin-left: 40px; }
+            .status-bar { left: 0; padding: 0 20px; }
+        }
+
+        @media (max-width: 768px) {
+            .floating-sidebar {
+                bottom: 20px;
+                top: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                flex-direction: row;
+                width: 90%;
+                padding: 10px;
+                height: 70px;
+                justify-content: space-around;
+            }
+            .section-container {
+                margin-left: 0;
+                margin-bottom: 80px;
+                padding: 80px 20px;
+            }
+            .mirror-footer {
+                margin-left: 20px;
+                margin-right: 20px;
+                margin-bottom: 120px;
+            }
+            .content-card { padding: 40px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cursor-glow"></div>
+
+    <!-- Professional Status Bar -->
+    <div class="status-bar">
+        <div class="flex items-center gap-6">
+            <span class="flex items-center gap-2"><i class="fas fa-satellite-dish text-blue-400"></i> G-TECH Node: Primary</span>
+            <span class="hidden md:inline text-gray-600">| Latency: 14ms</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="date" class="hidden sm:inline">APRIL 28</span>
+            <span id="clock">12:00 PM</span>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="floating-sidebar glass-panel">
+        <a href="javascript:void(0)" class="nav-dot active" onclick="showSection(0)" title="Home"><i class="fas fa-home"></i></a>
+        <a href="javascript:void(0)" class="nav-dot" onclick="showSection(1)" title="Projects & Experience"><i class="fas fa-rocket"></i></a>
+        <a href="javascript:void(0)" class="nav-dot" onclick="showSection(2)" title="Leadership"><i class="fas fa-users"></i></a>
+        <a href="javascript:void(0)" class="nav-dot" onclick="showSection(3)" title="The Ecosystem"><i class="fas fa-network-wired"></i></a>
+        <a href="javascript:void(0)" class="nav-dot" onclick="showSection(4)" title="Connect"><i class="fas fa-paper-plane"></i></a>
+    </nav>
+
+    <main class="section-container">
+        
+        <!-- SECTION 1: HERO HOME -->
+        <div id="section-0" class="content-card glass-panel active">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="avail-badge">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            CO-FOUNDERS OF G-TECH
+                        </div>
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black mb-6 tracking-tighter leading-tight">THE <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-gray-500">G-TECH</span> BOARD</h1>
+                    <p class="text-xl text-gray-400 max-w-xl mb-12 leading-relaxed font-light">
+                        Architecting <span class="text-white font-medium">enterprise-grade ecosystems</span> and premium interfaces. A collective of three founders dedicated to high-performance technology.
+                    </p>
+                    <div class="grid grid-cols-3 gap-4 mb-12">
+                        <div class="stat-box">
+                            <div class="text-2xl font-black text-white">3</div>
+                            <div class="text-[9px] uppercase tracking-widest text-gray-500 mt-1">Founders</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="text-2xl font-black text-white">99.9%</div>
+                            <div class="text-[9px] uppercase tracking-widest text-gray-500 mt-1">Uptime SLA</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="text-2xl font-black text-white">100+</div>
+                            <div class="text-[9px] uppercase tracking-widest text-gray-500 mt-1">Global Clients</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="showSection(2)" class="bg-white text-black px-10 py-5 rounded-2xl font-bold hover:bg-blue-400 hover:text-white transition-all">Meet the Founders</button>
+                        <a href="https://whatsapp.com/channel/0029Vb6uF3D3QxS9pPMU6N3U" target="_blank" class="glass-panel px-10 py-5 rounded-2xl font-bold hover:bg-white/5 transition-all flex items-center gap-3 border-white/10">
+                            <i class="fab fa-whatsapp text-green-400 text-lg"></i> Official Channel
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden md:flex w-80 h-96 glass-panel items-center justify-center relative p-1">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-500/20 to-transparent"></div>
+                    <div class="text-center z-10 px-6">
+                        <div class="w-24 h-24 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-users-gear text-4xl text-blue-400"></i>
+                        </div>
+                        <h4 class="font-black text-xl tracking-tight">G-TECH COLLECTIVE</h4>
+                        <p class="text-[10px] text-gray-500 mt-2 uppercase tracking-widest">Co-Founders ID: 0537418840</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: PROJECTS & TIMELINE -->
+        <div id="section-1" class="content-card glass-panel">
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div>
+                    <h2 class="text-3xl font-black mb-10 flex items-center gap-4">
+                        <span class="w-10 h-1 h-0.5 bg-blue-400"></span> EXPERIENCE
+                    </h2>
+                    <div class="timeline-item">
+                        <h3 class="text-xl font-bold text-white">Founding Team @ G-TECH Official</h3>
+                        <p class="text-blue-400 text-xs font-mono mb-3">2020 — PRESENT</p>
+                        <p class="text-sm text-gray-400 leading-relaxed">Developing integrated technology stacks for affiliate marketing and corporate infrastructure. Managed a 300% growth in network traffic within 24 months.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3 class="text-xl font-bold text-white">Sr. Architects @ G-TECH Learning</h3>
+                        <p class="text-purple-400 text-xs font-mono mb-3">2018 — 2020</p>
+                        <p class="text-sm text-gray-400 leading-relaxed">Engineered a scalable LMS handling 10k+ concurrent users. Implemented real-time tracking and automated certification protocols.</p>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black mb-10 flex items-center gap-4">
+                        <span class="w-10 h-1 h-0.5 bg-blue-400"></span> KEY PROJECTS
+                    </h2>
+                    <div class="grid gap-4">
+                        <div class="p-6 bg-white/5 border border-white/5 rounded-3xl group cursor-pointer hover:border-blue-500/50 transition">
+                            <div class="flex justify-between items-start mb-4">
+                                <i class="fas fa-shield-halved text-2xl text-blue-400"></i>
+                                <span class="text-[10px] bg-blue-400/10 text-blue-400 px-3 py-1 rounded-full">FINTECH</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1">G-Secure™ Gateway</h4>
+                            <p class="text-xs text-gray-500">AES-256 encrypted transaction layer for high-volume commerce.</p>
+                        </div>
+                        <div class="p-6 bg-white/5 border border-white/5 rounded-3xl group cursor-pointer hover:border-purple-500/50 transition">
+                            <div class="flex justify-between items-start mb-4">
+                                <i class="fas fa-layer-group text-2xl text-purple-400"></i>
+                                <span class="text-[10px] bg-purple-400/10 text-purple-400 px-3 py-1 rounded-full">SaaS</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1">Ecosystem Dashboard</h4>
+                            <p class="text-xs text-gray-500">Unified analytics for the entire G-TECH network portfolio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <!-- SECTION 3: LEADERSHIP -->
+<div id="section-2" class="content-card glass-panel">
+    <div class="text-center mb-16">
+        <h2 class="text-4xl font-black tracking-tighter mb-4">THE FOUNDERS</h2>
+        <p class="text-gray-500 max-w-xl mx-auto font-light">
+            The leadership driving the technical evolution of the G-TECH ecosystem.
+        </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+        <!-- Founder 1 -->
+        <div class="team-card glass-panel p-6 text-center">
+            <div class="team-image mb-4">
+                <img src="skofield.jpeg" alt="Mr. Skofield"
+                     class="w-32 h-32 mx-auto rounded-full object-cover border-4 border-blue-500 shadow-lg">
+            </div>
+            <h3 class="text-xl font-bold text-white">Mr. Skofield</h3>
+            <p class="text-xs text-blue-400 uppercase font-mono mt-1">
+                Co-Founder & Chief Architect
+            </p>
+        </div>
+
+        <!-- Founder 2 -->
+        <div class="team-card glass-panel p-6 text-center">
+            <div class="team-image mb-4">
+                <img src="Godfred.jpeg" alt="Co-Founder II"
+                     class="w-32 h-32 mx-auto rounded-full object-cover border-4 border-purple-500 shadow-lg">
+            </div>
+            <h3 class="text-xl font-bold text-white">TechProphet</h3>
+            <p class="text-xs text-purple-400 uppercase font-mono mt-1">
+                Strategic Operations
+            </p>
+        </div>
+
+        <!-- Founder 3 -->
+        <div class="team-card glass-panel p-6 text-center">
+            <div class="team-image mb-4">
+                <img src="ernest.jpg" alt="Co-Founder III"
+                     class="w-32 h-32 mx-auto rounded-full object-cover border-4 border-green-500 shadow-lg">
+            </div>
+            <h3 class="text-xl font-bold text-white">TheAlgoRythm</h3>
+            <p class="text-xs text-green-400 uppercase font-mono mt-1">
+                Global Ecosystems
+            </p>
+        </div>
+
+    </div>
+</div>
+        <!-- SECTION 4: THE ECOSYSTEM -->
+        <div id="section-3" class="content-card glass-panel">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black tracking-tighter mb-4">THE G-TECH NETWORK</h2>
+                <p class="text-gray-500 max-w-xl mx-auto font-light italic">"A seamless transition between education, commerce, and partnership."</p>
+            </div>
+            <div class="link-grid">
+                <a href="https://globaltechnologies.netlify.app/" target="_blank" class="link-card group">
+                    <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-8 mx-auto border border-blue-500/20 group-hover:scale-110 transition duration-500">
+                        <i class="fas fa-globe text-blue-400 text-2xl"></i>
+                    </div>
+                    <h3 class="font-black text-xl mb-3">G-TECH OFFICIAL</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed mb-6">The corporate epicenter of our technological innovations.</p>
+                    <div class="text-[10px] font-bold text-blue-400 flex items-center justify-center gap-2">
+                        VISIT HUB <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="https://g-tech-learning-platform-237673704829.us-west1.run.app/" target="_blank" class="link-card group">
+                    <div class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-8 mx-auto border border-purple-500/20 group-hover:scale-110 transition duration-500">
+                        <i class="fas fa-graduation-cap text-purple-400 text-2xl"></i>
+                    </div>
+                    <h3 class="font-black text-xl mb-3">G-TECH LEARNING</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed mb-6">High-performance training for tomorrow's elite engineers.</p>
+                    <div class="text-[10px] font-bold text-purple-400 flex items-center justify-center gap-2">
+                        START LEARNING <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="https://mrskofiled.netlify.app/" target="_blank" class="link-card group">
+                    <div class="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mb-8 mx-auto border border-green-500/20 group-hover:scale-110 transition duration-500">
+                        <i class="fas fa-handshake text-green-400 text-2xl"></i>
+                    </div>
+                    <h3 class="font-black text-xl mb-3">PARTNER PORTAL</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed mb-6">Scale your growth with our enterprise-level affiliate tools.</p>
+                    <div class="text-[10px] font-bold text-green-400 flex items-center justify-center gap-2">
+                        JOIN NETWORK <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- SECTION 5: CONTACT -->
+        <div id="section-4" class="content-card glass-panel">
+            <div class="text-center max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-blue-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-blue-500/20">
+                    <i class="fas fa-paper-plane text-blue-400 text-3xl"></i>
+                </div>
+                <h2 class="text-5xl font-black mb-6 tracking-tighter">START AN ENGAGEMENT</h2>
+                <p class="text-gray-400 mb-12 font-light text-lg">My current lead time for new architectural consultations is approximately 4 weeks. For urgent G-TECH support, please use our secure founder channel.</p>
+                
+                <div class="flex flex-col gap-4">
+                    <a href="https://whatsapp.com/channel/0029Vb6uF3D3QxS9pPMU6N3U" target="_blank" class="flex items-center justify-between bg-green-500 text-black px-10 py-6 rounded-3xl font-black text-xl hover:shadow-2xl hover:shadow-green-500/30 transition-all group">
+                        <span>Official Channel</span>
+                        <i class="fab fa-whatsapp text-3xl group-hover:rotate-12 transition-transform"></i>
+                    </a>
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="globaltech800@gmail.com" class="flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white py-5 rounded-3xl font-bold hover:bg-white/10 transition-all">
+                            <i class="fas fa-envelope"></i> EMAIL HUB
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mirror-footer glass-panel">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-black font-black text-lg">G</div>
+                    <h4 class="text-2xl font-black tracking-tighter">G-TECH COLLECTIVE</h4>
+                </div>
+                <p class="text-sm text-gray-500 leading-relaxed mb-8 max-w-sm">
+                    Operating at the vanguard of digital engineering. Delivering high-impact solutions through the G-TECH ecosystem since 2015.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition"><i class="fab fa-github text-sm"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition"><i class="fab fa-twitter text-sm"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-6 text-xs uppercase tracking-widest">Leadership</h4>
+                <ul class="text-sm space-y-3 text-gray-500">
+                    <li><a href="javascript:void(0)" onclick="showSection(2)" class="hover:text-blue-400 transition">Founding Board</a></li>
+                    <li><a href="javascript:void(0)" onclick="showSection(3)" class="hover:text-blue-400 transition">Ecosystem</a></li>
+                    <li><a href="javascript:void(0)" onclick="showSection(4)" class="hover:text-blue-400 transition">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-6 text-xs uppercase tracking-widest">Security</h4>
+                <ul class="text-sm space-y-3 text-gray-500">
+                    <li><a href="#" class="hover:text-purple-400 transition">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-purple-400 transition">Security Audit</a></li>
+                    <li><a href="#" class="hover:text-purple-400 transition">G-TECH Assets</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-[10px] text-gray-700 uppercase tracking-widest">© 2026 G-TECH BOARD ENTERPRISES. ALL RIGHTS RESERVED.</p>
+            <div class="flex items-center gap-2 text-[10px] text-blue-500/40 font-mono">
+                <i class="fas fa-lock"></i>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mouse Tracking Glow Logic
+        const glow = document.getElementById('cursor-glow');
+        document.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        // Update clock in status bar
+        function updateClock() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const dateOptions = { month: 'long', day: 'numeric' };
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], options);
+            document.getElementById('date').innerText = now.toLocaleDateString([], dateOptions).toUpperCase();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function showSection(index) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const dots = document.querySelectorAll('.nav-dot');
+            dots.forEach((dot, i) => {
+                if (i === index) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+
+            const cards = document.querySelectorAll('.content-card');
+            cards.forEach((card, i) => {
+                if (i === index) card.classList.add('active');
+                else card.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>
